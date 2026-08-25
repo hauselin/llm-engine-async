@@ -1,6 +1,6 @@
 # llm-engine-async
 
-Example code for calling OpenRouter models asynchronously and in batch mode.
+Example code for calling OpenRouter models asynchronously and in batch mode. See examples in `src/process`.
 
 ## 1. Install
 
