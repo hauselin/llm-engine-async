@@ -29,7 +29,7 @@ OUT_DIR = DATA_DIR
 
 INPUT_FILE = "example-data.csv"
 CONTENT_COL = "content"
-OUTFILE = "example-data-factcheck-web-batch.jsonl"
+OUTFILE = "example-data-factcheck-batch.jsonl"
 
 # NOTE: update ID_COLS to match the input data columns accordingly
 ID_COLS = ["responseid", "model", "id"]
