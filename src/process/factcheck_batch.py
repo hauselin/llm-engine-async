@@ -119,8 +119,8 @@ def build_request(data: dict) -> dict:
             {"role": "system", "content": SYSTEM_PROMPT},
             {"role": "user", "content": data[CONTENT_COL].strip()},
         ],
-        # web search is billed at full price; only model tokens get the batch discount
-        # tool use might not be supported in batch mode; see https://openrouter.ai/docs/batch-quickstart
+        # NOTE: web search (openrouter:web_search tool, web_search_options) is
+        # rejected by the Batch API as of 2026-08; use factcheck.py for search
         # "tools": [
         #     {"type": "openrouter:web_search", "parameters": {"engine": "native"}}
         # ],
