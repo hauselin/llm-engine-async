@@ -245,6 +245,15 @@ def run_batch_api(
             continue
         n_success = n_written = 0
         results = batch["results"] or []
+        # per-request bodies carry tokens but no cost; apportion batch cost by token share
+        batch_cost = (batch.get("usage") or {}).get("cost", 0.0)
+        batch_tokens = sum(
+            r.get("response", {})
+            .get("body", {})
+            .get("usage", {})
+            .get("total_tokens", 0)
+            for r in results
+        )
         for result in results:
             cid = result["custom_id"]
             data = entry["rows"][cid]
@@ -256,7 +265,10 @@ def run_batch_api(
                 target = error_path
             else:
                 body = result["response"]["body"]
-                data["cost"] = body.get("usage", {}).get("cost", 0.0)
+                tokens = body.get("usage", {}).get("total_tokens", 0)
+                data["cost"] = (
+                    batch_cost * tokens / batch_tokens if batch_tokens else 0.0
+                )
                 try:
                     data |= response_model.model_validate_json(
                         body["choices"][0]["message"]["content"] or ""
@@ -273,10 +285,9 @@ def run_batch_api(
                 _append_jsonl(target, data)
                 on_disk.add(cid)
                 n_written += 1
-        cost = (batch.get("usage") or {}).get("cost", 0.0)
         logger.success(
             f"{entry['batch_id']} ({entry['model']}): {n_success}/{len(results)} success,"
-            f" {n_written} rows written, cost ${cost:.4f}"
+            f" {n_written} rows written, cost ${batch_cost:.4f}"
         )
     registry_path.write_text(json.dumps(registry, indent=1))
 

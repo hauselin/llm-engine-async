@@ -29,7 +29,7 @@ OUT_DIR = DATA_DIR
 
 INPUT_FILE = "example-data.csv"
 CONTENT_COL = "content"
-OUTFILE = "example-data-factcheck.jsonl"
+OUTFILE = "example-data-factcheck-web-batch.jsonl"
 
 # NOTE: update ID_COLS to match the input data columns accordingly
 ID_COLS = ["responseid", "model", "id"]
@@ -119,6 +119,11 @@ def build_request(data: dict) -> dict:
             {"role": "system", "content": SYSTEM_PROMPT},
             {"role": "user", "content": data[CONTENT_COL].strip()},
         ],
+        # web search is billed at full price; only model tokens get the batch discount
+        # tool use might not be supported in batch mode; see https://openrouter.ai/docs/batch-quickstart
+        # "tools": [
+        #     {"type": "openrouter:web_search", "parameters": {"engine": "native"}}
+        # ],
     }
 
 
