@@ -185,7 +185,7 @@ run_batch_api(dat, build_request, Response, OUT_DIR, OUTFILE, ID_COLS)
 Each run does two things, in order:
 
 1. **Collect.** For every batch in `<OUTFILE>.batches.json` whose rows are not all on disk, `GET` it. Non-terminal (`validating`/`in_progress`/`finalizing`): log status and counts. `completed`: validate each result with `Response`, append successes to `OUTFILE` and failures to `*_errors.jsonl` (rows carry `batch_id`, `pulltime`, `cost`), writing only rows not already present. `failed`/`expired`/`cancelled`: write every row to the error file so the batch is skipped next time and the rows retry through the normal dedup path.
-2. **Submit.** Rows in `dat` that are not in a pending batch and were not just collected are grouped by model and submitted, one batch per model. The registry records `batch_id`, `model`, `submitted_at`, and `custom_id -> input row` (`custom_id` = JSON of the row's `ID_COLS` values, so `ID_COLS` must uniquely identify a row).
+2. **Submit.** Rows in `dat` that are not in a pending batch and were not just collected are grouped by model and submitted, one batch per model. The registry records `batch_id`, `model`, `submitted_at`, and `custom_id -> input row` (`custom_id` = SHA-1 of the row's `ID_COLS` values — providers restrict its characters — so `ID_COLS` must uniquely identify a row).
 
 Run the script once to submit, again later (within 24h) to collect; re-running is always safe. The registry is append-only and "done" is derived from the output files, so deleting `OUTFILE` (or a single row in it) rebuilds it from the stored batches — results are kept by OpenRouter for 30 days — without resubmitting or paying again. A batch cannot be modified after submission; more rows mean another batch.
 

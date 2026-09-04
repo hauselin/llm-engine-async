@@ -15,6 +15,7 @@ Dependencies:
 # %%
 
 import asyncio
+import hashlib
 import json
 import os
 import time
@@ -203,7 +204,10 @@ def run_batch_api(
     )
 
     def key(row: dict) -> str:
-        return json.dumps([row[col] for col in id_cols])
+        # some providers restrict custom_id to [A-Za-z0-9_-]; hash the id values
+        # (the registry keeps the full row under each id, so nothing is lost)
+        raw = json.dumps([row[col] for col in id_cols])
+        return hashlib.sha1(raw.encode()).hexdigest()
 
     def written_keys(path: Path) -> set[str]:
         if not path.exists():
