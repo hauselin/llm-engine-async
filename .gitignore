@@ -224,3 +224,6 @@ __marimo__/
 data/processed/*json*
 data/processed/example-data-factcheck.csv
 data/processed/example-data-factcheck-batch.csv
+
+
+specs/
